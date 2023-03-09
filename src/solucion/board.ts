@@ -7,9 +7,13 @@ import { setTile, setTurn, setWinner } from "../UI/state";
 export class Board {
   public tiles: Tile[][];
   private boardSize: number;
+  public clickedTile: Tile[];
+  public turn: Player;
   constructor() {
     this.boardSize = 8;
     this.tiles = this.initBoard();
+    this.clickedTile = [];
+    this.turn = "blue";
   }
   private initBoard(): Tile[][] {
     const board: Tile[][] = [];
@@ -40,9 +44,31 @@ export class Board {
       for (let j = 0; j < this.boardSize; j++) {
         let tile = this.tiles[i][j];
         let [x, y] = tile.position;
-        let type: TileOwner = tile.mapTileOwner()
+        let type: TileOwner = tile.mapTileOwner();
         setTile(x, y, type);
       }
+    }
+  }
+  /**
+   * Move Piece
+   */
+
+  public processClick(row: number, column: number, tileOwner: TileOwner) {
+    let newTile = this.tiles[row][column];
+    console.log(newTile);
+    if (this.clickedTile.length === 0) {
+      if (newTile.owner !== "none") {
+        this.clickedTile.push(newTile);
+        console.log("push");
+        
+      }
+    } else {
+      let selectTile = this.clickedTile[0];
+      let canMove = selectTile.Move(newTile, this.tiles)
+      console.log(canMove);
+      
+      this.clickedTile.pop();
+      console.log("pop");
     }
   }
 }
