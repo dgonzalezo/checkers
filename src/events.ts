@@ -6,7 +6,7 @@ import { Tile } from "./solucion/tile";
 let turn: Player = "blue";
 
 let board = new Board();
-let clickedTiles: Tile[] = [];
+// let clickedTiles: Tile[] = [];
 /**
  * Called when the user clicks on a tile
  * @param row of the clicked tile
@@ -15,37 +15,7 @@ let clickedTiles: Tile[] = [];
  */
 export function onTileClick(row: number, column: number, tileOwner: TileOwner) {
   console.log(`row: ${row} column: ${column} owner: ${tileOwner}`);
-  let tile = board.tiles[row][column];
-  if (clickedTiles.length !== 0) {
-    if (tile.owner === "none") {
-      console.log("prueba");
-      // let color = tileOwner.split(" ")[0]
-      // if (clickedTiles[0].owner.color == turn) {
-      let selectTile = clickedTiles[0];
-      let [x, y] = selectTile.position;
-      console.log(selectTile);
-      setTile(x, y, "none");
-      let type: TileOwner = selectTile.mapTileOwner();
-      setTile(row, column, type);
-      tile.owner = selectTile.owner;
-      selectTile.owner = "none";
-      clickedTiles.pop();
-      console.log("pop");
-      return;
-    } else {
-      clickedTiles.pop();
-      console.log("pop");
-      return;
-    }
-    // }
-  }
-  if (tile.owner !== "none" && clickedTiles.length === 0) {
-    clickedTiles.push(tile);
-    console.log("push");
-
-    console.log(clickedTiles);
-    console.log(clickedTiles.length);
-  }
+  board.processClick(row, column, tileOwner)
 }
 
 /**
