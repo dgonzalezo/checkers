@@ -1,9 +1,9 @@
-import { TileOwner } from "./types";
-// import { setTile, setTurn, setWinner } from "./UI/state";
+import { Player, TileOwner } from "./types";
+import { setTile, setTurn, setWinner } from "./UI/state";
 import { Board } from "./solucion/board";
-// import { Tile } from "./solucion/tile";
+import { Tile } from "./solucion/tile";
 
-// let turn: Player = "blue";
+let turn: Player = "blue";
 
 let board = new Board();
 // let clickedTiles: Tile[] = [];

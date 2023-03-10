@@ -1,8 +1,8 @@
 import { Pawn, Queen } from "./pieces";
 import { Tile } from "./tile";
-import { Owner } from "./types";
+import { PieceType, Color, Owner } from "./types";
 import { Player, TileOwner } from "../types";
-import { setTile } from "../UI/state";
+import { setTile, setTurn, setWinner } from "../UI/state";
 
 export class Board {
   public tiles: Tile[][];

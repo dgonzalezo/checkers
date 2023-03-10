@@ -1,4 +1,4 @@
-import { setTile} from "../UI/state";
+import { setTile, setTurn, setWinner } from "../UI/state";
 import { Position, Owner } from "./types";
 import { TileOwner } from "../types";
 
