@@ -7,14 +7,22 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-
+  build-and-deploy:
     runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v2
 
-    - name: Deploy react app to github pages
-      uses: tanwanimohit/deploy-react-to-ghpages@v1.0.1
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout repo 🛎️
+        uses: actions/checkout@v2
+
+      - name: Install dependencies 🔧
+        run: npm install
+
+      - name: Build app 🏗️
+        run: npm run build
+
+      - name: Deploy to GitHub Pages 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.0
+        with:
+          branch: gh-pages 
+          folder: build
+          token: ${{ secrets.GITHUB_TOKEN }}
