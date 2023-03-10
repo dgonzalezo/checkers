@@ -1,6 +1,5 @@
 import { Color, Position, PieceType } from "./types";
 import { Tile } from "./tile";
-import { Board } from "./board";
 export abstract class Piece {
   constructor(
     public color: Color,
