@@ -23,5 +23,5 @@ jobs:
       - name: Deploy to GitHub Pages 🚀
         run: npm run deploy
         env:
-          CI: true
+          CI: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
