@@ -1,5 +1,5 @@
 import { TileOwner } from "./types";
-import { setTurn } from "./UI/state";
+import { setTurn, setWinner } from "./UI/state";
 import { Board } from "./solucion/board";
 
 //start the game
@@ -31,4 +31,5 @@ export function onRestart() {
   board = new Board(allowMultipluJumps, forceCapture);
   board.drawBoard();
   setTurn(board.turn);
+  setWinner(undefined)
 }
