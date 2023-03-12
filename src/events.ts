@@ -28,7 +28,7 @@ export function onRestart() {
   const capture = document.getElementById("capture") as HTMLInputElement;
   const allowMultipluJumps = jumps.checked;
   const forceCapture = capture.checked;
-  let board = new Board(allowMultipluJumps, forceCapture);
+  board = new Board(allowMultipluJumps, forceCapture);
   board.drawBoard();
   setTurn(board.turn);
 }
