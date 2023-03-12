@@ -2,18 +2,29 @@ import { Pawn, Queen } from "./pieces";
 import { Tile } from "./tile";
 import { Owner } from "./types";
 import { Player, TileOwner } from "../types";
-import { setTile } from "../UI/state";
+import { setTurn, setWinner } from "../UI/state";
 
 export class Board {
   public tiles: Tile[][];
   private boardSize: number;
   public clickedTile: Tile[];
   public turn: Player;
-  constructor() {
+  public winner: Player | null;
+  public queens: { blue: Tile | null; red: Tile | null } = {
+    blue: null,
+    red: null,
+  };
+  constructor(
+    public allowMultipleJumps: boolean = false,
+    public forceCapture: boolean = false
+  ) {
     this.boardSize = 8;
     this.tiles = this.initBoard();
     this.clickedTile = [];
     this.turn = "blue";
+    this.winner = null;
+    this.queens.blue = this.tiles[0][0];
+    this.queens.red = this.tiles[7][7];
   }
   private initBoard(): Tile[][] {
     const board: Tile[][] = [];
@@ -43,30 +54,113 @@ export class Board {
     for (let i = 0; i < this.boardSize; i++) {
       for (let j = 0; j < this.boardSize; j++) {
         let tile = this.tiles[i][j];
-        let [x, y] = tile.position;
-        let type: TileOwner = tile.mapTileOwner();
-        setTile(x, y, type);
+        tile.drawPiece();
       }
+    }
+  }
+  /**
+   * changeTurn
+   */
+  public changeTurn() {
+    if (this.turn === "red") {
+      this.turn = "blue";
+      setTurn("blue");
+    } else {
+      this.turn = "red";
+      setTurn("red");
+    }
+  }
+  /**
+   * checkWinner
+   */
+  public checkWinner(tile: Tile) {
+    if (tile.owner !== "none" && tile.owner.getType() === "queen") {
+      if (tile.owner.color === "blue" && tile.owner.position[0] === 7) {
+        setWinner("blue");
+        this.winner = "blue";
+      }
+      if (tile.owner.color === "red" && tile.owner.position[0] === 0) {
+        setWinner("red");
+        this.winner = "red";
+      }
+    }
+  }
+  /**
+   * selectNewQueen
+   */
+  public selectNewQueen(newTile: Tile) {
+    let posibleTiles: Tile[] = [];
+
+    for (let i = 0; i < this.boardSize; i++) {
+      for (let j = 0; j < this.boardSize; j++) {
+        let tile = this.tiles[i][j];
+        // Adding only pieces of the same player
+        if (tile.owner !== "none" && tile.owner.color === this.turn) {
+          if (!!posibleTiles.length) {
+            let lastTile = posibleTiles[0];
+            // Adding only furthest position from tho opposiet side y has to be < for blue and y has to be > for red
+            if (
+              (this.turn === "blue" &&
+                tile.position[0] < lastTile.position[0]) ||
+              (this.turn === "red" && tile.position[0] > lastTile.position[0])
+            ) {
+              posibleTiles = [tile];
+              // Adding pieces with the same distance or in the same row
+            } else if (tile.position[0] === lastTile.position[0]) {
+              posibleTiles.push(tile);
+            }
+          } else {
+            posibleTiles.push(tile);
+          }
+        }
+      }
+    }
+    let change: boolean = posibleTiles.some(
+      (tile) =>
+        tile.position[0] === newTile.position[0] &&
+        tile.position[1] === newTile.position[1]
+    );
+    if (change) {
+      newTile.owner = new Queen(this.turn, newTile.position);
+      this.queens[this.turn] = newTile;
+      newTile.drawPiece();
+    } else {
+      alert("Select a valid new queen.");
     }
   }
   /**
    * Move Piece
    */
 
-  public processClick(row: number, column: number, tileOwner: TileOwner) {
+  public processClick(
+    row: number,
+    column: number,
+    tileOwner: TileOwner,
+    board: Board
+  ) {
     let newTile = this.tiles[row][column];
-    console.log(newTile);
+    if (!this.queens.blue || !this.queens.red) {
+      this.selectNewQueen(newTile);
+      return;
+    }
+    if (this.winner) {
+      alert("Please restart the game");
+      return;
+    }
     if (this.clickedTile.length === 0) {
-      if (newTile.owner !== "none") {
+      if (newTile.owner !== "none" && newTile.owner.color === this.turn) {
         this.clickedTile.push(newTile);
         console.log("push");
-        
       }
     } else {
       let selectTile = this.clickedTile[0];
-      let canMove = selectTile.Move(newTile, this.tiles)
+      let canMove = selectTile.Move(newTile, board);
+      if (canMove) {
+        this.checkWinner(newTile);
+        this.changeTurn();
+      }
       console.log(canMove);
-      
+
       this.clickedTile.pop();
       console.log("pop");
     }
