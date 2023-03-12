@@ -1,6 +1,7 @@
-import { setTile, setTurn, setWinner } from "../UI/state";
+import { setTile} from "../UI/state";
 import { Position, Owner } from "./types";
 import { TileOwner } from "../types";
+import { Board } from "./board";
 
 export class Tile {
   constructor(public position: Position, public owner: Owner) {}
@@ -20,7 +21,7 @@ export class Tile {
   /**
    * canMove
    */
-  public Move(toTile: Tile, tiles: Tile[][]): boolean {
+  public Move(toTile: Tile, board: Board): boolean {
     if (this.owner === "none") {
       return false;
     }
@@ -31,11 +32,11 @@ export class Tile {
     if (diffX > 1 && diffY > 1) {
       const middleX = x < to_x ? x + 1 : x - 1;
       const middleY = y < to_y ? y + 1 : y - 1;
-      let middleTile = tiles[middleX][middleY];
+      let middleTile = board.tiles[middleX][middleY];
       let canAttack = this.owner.canAttack(toTile, middleTile);
       if (canAttack) {
         console.log("attack");
-        
+        this.checkAttackQueen(middleTile, board);
         this.attackPieceDraw(toTile, middleTile);
       }
       return canAttack;
@@ -54,29 +55,40 @@ export class Tile {
    */
   public movePieceDraw(toTile: Tile) {
     if (this.owner !== "none") {
-      let [x, y] = this.position;
       let [to_x, to_y] = toTile.position;
       this.owner.position = [to_x, to_y];
       toTile.owner = this.owner;
-      let type: TileOwner = this.mapTileOwner();
-      setTile(to_x, to_y, type);
+      toTile.drawPiece()
       this.owner = "none";
-      setTile(x, y, "none");
+      this.drawPiece()
     }
   }
   public attackPieceDraw(toTile: Tile, middleTile: Tile) {
     if (this.owner !== "none") {
-      let [x, y] = this.position;
       let [to_x, to_y] = toTile.position;
-      let [m_x, m_y] = middleTile.position;
       this.owner.position = [to_x, to_y];
       toTile.owner = this.owner;
-      let type: TileOwner = this.mapTileOwner();
-      setTile(to_x, to_y, type);
+      toTile.drawPiece()
       this.owner = "none";
+      this.drawPiece()
       middleTile.owner = "none";
-      setTile(x, y, "none");
-      setTile(m_x, m_y, "none");
+      middleTile.drawPiece()
+    }
+  }
+  /**
+   * drawPiece
+   */
+  public drawPiece() {
+    let [x, y] = this.position;
+    let type: TileOwner = this.mapTileOwner();
+    setTile(x, y, type);
+  }
+  /**
+   * deleteQueen
+   */
+  public checkAttackQueen(middleTile: Tile, board: Board) {
+    if (middleTile.owner !== "none" && middleTile.owner.getType() === "queen") {
+      board.queens[middleTile.owner.color] = null;
     }
   }
 }
