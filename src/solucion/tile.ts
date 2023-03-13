@@ -42,7 +42,6 @@ export class Tile {
           ? this.owner.canAttack(toTile, middleTile)
           : false;
         if (canAttack) {
-          console.log("attack");
           this.checkAttackQueen(middleTile, board);
           this.attackPieceDraw(toTile, middleTile);
         }
@@ -50,7 +49,6 @@ export class Tile {
       } else {
         let canMove = this.owner.canMove(toTile);
         if (canMove) {
-          console.log("move");
           this.movePieceDraw(toTile);
         }
 
@@ -59,7 +57,6 @@ export class Tile {
     } else {
       let canMove = this.owner.canMove(toTile);
       if (canMove) {
-        console.log("move");
         this.movePieceDraw(toTile);
       }
 

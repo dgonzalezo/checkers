@@ -170,9 +170,6 @@ export class Board {
     if (this.clickedTile.length === 0) {
       if (newTile.owner !== "none" && newTile.owner.color === this.turn) {
         this.clickedTile.push(newTile);
-        console.log("posible attacks: ");
-        console.log(newTile.calculateJumps(board));
-        console.log("push");
       }
     } else {
       let selectTile = this.clickedTile[0];
@@ -182,10 +179,8 @@ export class Board {
         this.checkSuperPawn(newTile);
         this.changeTurn();
       }
-      console.log(canMove);
 
       this.clickedTile.pop();
-      console.log("pop");
     }
   }
 }
