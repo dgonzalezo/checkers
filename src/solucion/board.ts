@@ -124,6 +124,7 @@ export class Board {
       newTile.owner = new Queen(this.turn, newTile.position);
       this.queens[this.turn] = newTile;
       newTile.drawPiece();
+      this.checkWinner(newTile);
     } else {
       alert("Select a valid new queen.");
     }
