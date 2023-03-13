@@ -14,7 +14,7 @@ export abstract class Piece {
 }
 
 export class Pawn extends Piece {
-  constructor(public color: Color, public position: Position) {
+  constructor(public color: Color, public position: Position, private superPawn =false) {
     super(color, position, "pawn");
   }
   canMove(toTile: Tile): boolean {
@@ -32,7 +32,7 @@ export class Pawn extends Piece {
       this.color === "blue"
         ? toTile.position[0] < this.position[0]
         : toTile.position[0] > this.position[0];
-    if (direction) {
+    if (direction && !this.superPawn) {
       return false;
     }
     if (x === to_x || y === to_y) {
@@ -54,6 +54,9 @@ export class Pawn extends Piece {
       return false;
     }
     return true;
+  }
+  public setsuperPawn() {
+    this.superPawn = true;
   }
 }
 

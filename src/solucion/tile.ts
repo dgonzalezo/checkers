@@ -1,4 +1,4 @@
-import { setTile} from "../UI/state";
+import { setTile } from "../UI/state";
 import { Position, Owner } from "./types";
 import { TileOwner } from "../types";
 import { Board } from "./board";
@@ -29,17 +29,33 @@ export class Tile {
     let [to_x, to_y] = toTile.position;
     let diffX = Math.abs(x - to_x);
     let diffY = Math.abs(y - to_y);
-    if (diffX > 1 && diffY > 1) {
-      const middleX = x < to_x ? x + 1 : x - 1;
-      const middleY = y < to_y ? y + 1 : y - 1;
-      let middleTile = board.tiles[middleX][middleY];
-      let canAttack = this.owner.canAttack(toTile, middleTile);
-      if (canAttack) {
-        console.log("attack");
-        this.checkAttackQueen(middleTile, board);
-        this.attackPieceDraw(toTile, middleTile);
+    if (board.forceCapture || (diffX > 1 && diffY > 1)) {
+      let canAttackTiles = this.calculateAttack(board);
+      if (canAttackTiles.length) {
+        let canMoveAttack = canAttackTiles.some(
+          (tile) =>
+            tile.position[0] === this.position[0] &&
+            tile.position[1] === this.position[1]
+        );
+        let middleTile = this.calculateMiddle(toTile, board);
+        let canAttack = canMoveAttack
+          ? this.owner.canAttack(toTile, middleTile)
+          : false;
+        if (canAttack) {
+          console.log("attack");
+          this.checkAttackQueen(middleTile, board);
+          this.attackPieceDraw(toTile, middleTile);
+        }
+        return canAttack;
+      } else {
+        let canMove = this.owner.canMove(toTile);
+        if (canMove) {
+          console.log("move");
+          this.movePieceDraw(toTile);
+        }
+
+        return canMove;
       }
-      return canAttack;
     } else {
       let canMove = this.owner.canMove(toTile);
       if (canMove) {
@@ -51,6 +67,17 @@ export class Tile {
     }
   }
   /**
+   * calculateMiddle (Piece)
+   */
+  public calculateMiddle(toTile: Tile, board: Board): Tile {
+    let [x, y] = this.position;
+    let [to_x, to_y] = toTile.position;
+    const middleX = x < to_x ? x + 1 : x - 1;
+    const middleY = y < to_y ? y + 1 : y - 1;
+    let middleTile = board.tiles[middleX][middleY];
+    return middleTile;
+  }
+  /**
    * movePiece
    */
   public movePieceDraw(toTile: Tile) {
@@ -58,9 +85,9 @@ export class Tile {
       let [to_x, to_y] = toTile.position;
       this.owner.position = [to_x, to_y];
       toTile.owner = this.owner;
-      toTile.drawPiece()
+      toTile.drawPiece();
       this.owner = "none";
-      this.drawPiece()
+      this.drawPiece();
     }
   }
   public attackPieceDraw(toTile: Tile, middleTile: Tile) {
@@ -68,11 +95,11 @@ export class Tile {
       let [to_x, to_y] = toTile.position;
       this.owner.position = [to_x, to_y];
       toTile.owner = this.owner;
-      toTile.drawPiece()
+      toTile.drawPiece();
       this.owner = "none";
-      this.drawPiece()
+      this.drawPiece();
       middleTile.owner = "none";
-      middleTile.drawPiece()
+      middleTile.drawPiece();
     }
   }
   /**
@@ -90,5 +117,53 @@ export class Tile {
     if (middleTile.owner !== "none" && middleTile.owner.getType() === "queen") {
       board.queens[middleTile.owner.color] = null;
     }
+  }
+  /**
+   * calculateJumps
+   */
+  public calculateJumps(board: Board) {
+    let posibleMovements: Position[] = [
+      [this.position[0] + 2, this.position[1] + 2],
+      [this.position[0] - 2, this.position[1] - 2],
+      [this.position[0] + 2, this.position[1] - 2],
+      [this.position[0] - 2, this.position[1] + 2],
+    ];
+    let posibleAttacks: Tile[] = [];
+    for (let i = 0; i < posibleMovements.length; i++) {
+      let [x, y] = posibleMovements[i];
+      if (x < 8 && x >= 0 && y >= 0 && y < 8) {
+        let toTile = board.tiles[x][y];
+        let middleTile = this.calculateMiddle(toTile, board);
+        if (this.owner !== "none" && this.owner.canAttack(toTile, middleTile)) {
+          posibleAttacks.push(board.tiles[x][y]);
+        }
+      }
+    }
+    return posibleAttacks;
+  }
+  /**
+   * calculateAttack
+   */
+  public calculateAttack(board: Board): Tile[] {
+    let canAttackTiles: Tile[] = [];
+    if (board.forceCapture) {
+      for (let i = 0; i < board.size; i++) {
+        for (let j = 0; j < board.size; j++) {
+          let tile = board.tiles[i][j];
+          if (tile.owner !== "none" && tile.owner.color === board.turn) {
+            let posibleAttacks = tile.calculateJumps(board);
+            if (posibleAttacks.length) {
+              canAttackTiles.push(tile);
+            }
+          }
+        }
+      }
+    } else {
+      let posibleAttacks = this.calculateJumps(board);
+      if (posibleAttacks.length) {
+        canAttackTiles.push(this);
+      }
+    }
+    return canAttackTiles;
   }
 }

@@ -20,6 +20,18 @@ export function onTileClick(row: number, column: number, tileOwner: TileOwner) {
   board.processClick(row, column, tileOwner, board);
 }
 
+export function onApply() {
+  const jumps = document.getElementById("jumps") as HTMLInputElement;
+  const capture = document.getElementById("capture") as HTMLInputElement;
+  board.forceCapture = capture.checked;
+  board.allowMultipleJumps = jumps.checked;
+  alert("Changes Applied")
+  console.log("allowMultipleJumps");
+  console.log(board.allowMultipleJumps);
+  console.log("forceCapture");
+  console.log(board.forceCapture);
+  
+}
 /**
  * Called when the user clicks on the "restart" button
  */
@@ -31,5 +43,5 @@ export function onRestart() {
   board = new Board(allowMultipluJumps, forceCapture);
   board.drawBoard();
   setTurn(board.turn);
-  setWinner(undefined)
+  setWinner(undefined);
 }

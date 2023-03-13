@@ -1,6 +1,6 @@
 import "./styles.css";
 import { useGlobalState } from "./state";
-import { onTileClick, onRestart } from "../events";
+import { onTileClick, onRestart, onApply } from "../events";
 
 export default function App() {
   const { board, winner, turn } = useGlobalState();
@@ -63,6 +63,7 @@ export default function App() {
         <span style={{ color: turn }}>{turn}</span> is playing.
       </div>
       <div className="board">{renderBoard()}</div>
+      <button onClick={onApply}>Apply</button>
     </>
   );
 }
