@@ -6,7 +6,7 @@ import { setTurn, setWinner } from "../UI/state";
 
 export class Board {
   public tiles: Tile[][];
-  private boardSize: number;
+  public size: number;
   public clickedTile: Tile[];
   public turn: Player;
   public winner: Player | null;
@@ -18,7 +18,7 @@ export class Board {
     public allowMultipleJumps: boolean = false,
     public forceCapture: boolean = false
   ) {
-    this.boardSize = 8;
+    this.size = 8;
     this.tiles = this.initBoard();
     this.clickedTile = [];
     this.turn = "blue";
@@ -28,9 +28,9 @@ export class Board {
   }
   private initBoard(): Tile[][] {
     const board: Tile[][] = [];
-    for (let i = 0; i < this.boardSize; i++) {
+    for (let i = 0; i < this.size; i++) {
       let row: Tile[] = [];
-      for (let j = 0; j < this.boardSize; j++) {
+      for (let j = 0; j < this.size; j++) {
         let owner: Owner = "none";
         if (i < 3 && (i + j) % 2 === 0) {
           owner = new Pawn("blue", [i, j]);
@@ -51,8 +51,8 @@ export class Board {
    * retartGame
    */
   public drawBoard() {
-    for (let i = 0; i < this.boardSize; i++) {
-      for (let j = 0; j < this.boardSize; j++) {
+    for (let i = 0; i < this.size; i++) {
+      for (let j = 0; j < this.size; j++) {
         let tile = this.tiles[i][j];
         tile.drawPiece();
       }
@@ -86,13 +86,26 @@ export class Board {
     }
   }
   /**
+   * checkSuperPawn
+   */
+  public checkSuperPawn(tile: Tile) {
+    if (tile.owner !== "none" && tile.owner instanceof Pawn) {
+      if (
+        (tile.owner.color === "blue" && tile.owner.position[0] === 7) ||
+        (tile.owner.color === "red" && tile.owner.position[0] === 0)
+      ) {
+        tile.owner.setsuperPawn();
+      }
+    }
+  }
+  /**
    * selectNewQueen
    */
   public selectNewQueen(newTile: Tile) {
     let posibleTiles: Tile[] = [];
 
-    for (let i = 0; i < this.boardSize; i++) {
-      for (let j = 0; j < this.boardSize; j++) {
+    for (let i = 0; i < this.size; i++) {
+      for (let j = 0; j < this.size; j++) {
         let tile = this.tiles[i][j];
         // Adding only pieces of the same player
         if (tile.owner !== "none" && tile.owner.color === this.turn) {
@@ -114,6 +127,12 @@ export class Board {
           }
         }
       }
+    }
+    if (!posibleTiles.length) {
+      let winner: Player = this.turn === "blue" ? "red" : "blue";
+      setWinner(winner);
+      this.winner = winner;
+      return;
     }
     let change: boolean = posibleTiles.some(
       (tile) =>
@@ -140,17 +159,19 @@ export class Board {
     board: Board
   ) {
     let newTile = this.tiles[row][column];
-    if (!this.queens.blue || !this.queens.red) {
-      this.selectNewQueen(newTile);
-      return;
-    }
     if (this.winner) {
       alert("Please restart the game");
+      return;
+    }
+    if (!this.queens.blue || !this.queens.red) {
+      this.selectNewQueen(newTile);
       return;
     }
     if (this.clickedTile.length === 0) {
       if (newTile.owner !== "none" && newTile.owner.color === this.turn) {
         this.clickedTile.push(newTile);
+        console.log("posible attacks: ");
+        console.log(newTile.calculateJumps(board));
         console.log("push");
       }
     } else {
@@ -158,6 +179,7 @@ export class Board {
       let canMove = selectTile.Move(newTile, board);
       if (canMove) {
         this.checkWinner(newTile);
+        this.checkSuperPawn(newTile);
         this.changeTurn();
       }
       console.log(canMove);
