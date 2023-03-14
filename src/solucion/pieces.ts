@@ -14,7 +14,11 @@ export abstract class Piece {
 }
 
 export class Pawn extends Piece {
-  constructor(public color: Color, public position: Position, private superPawn =false) {
+  constructor(
+    public color: Color,
+    public position: Position,
+    private superPawn = false
+  ) {
     super(color, position, "pawn");
   }
   canMove(toTile: Tile): boolean {
@@ -28,6 +32,8 @@ export class Pawn extends Piece {
     if (toTile.owner !== "none") {
       return false;
     }
+    // if next position is lower than current position is true so it is a worng move for blue
+    // and otherwies for red
     const direction: boolean =
       this.color === "blue"
         ? toTile.position[0] < this.position[0]
@@ -57,6 +63,9 @@ export class Pawn extends Piece {
   }
   public setsuperPawn() {
     this.superPawn = true;
+  }
+  public getsuperPawn() {
+    return this.superPawn;
   }
 }
 
@@ -97,4 +106,3 @@ export class Queen extends Piece {
     return true;
   }
 }
-

@@ -26,11 +26,6 @@ export function onApply() {
   board.forceCapture = capture.checked;
   board.allowMultipleJumps = jumps.checked;
   alert("Changes Applied")
-  console.log("allowMultipleJumps");
-  console.log(board.allowMultipleJumps);
-  console.log("forceCapture");
-  console.log(board.forceCapture);
-  
 }
 /**
  * Called when the user clicks on the "restart" button
