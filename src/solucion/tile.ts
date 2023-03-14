@@ -215,7 +215,7 @@ export class Tile {
     let openTiles: Tile[] = [];
     openTiles.push(fromTile);
 
-    while (openTiles.length ) {
+    while (openTiles.length) {
       let tileParent = openTiles.shift()!;
       let jumps = tileParent.possibleMultiJumps(fromTile, board);
 
@@ -360,6 +360,7 @@ export class Tile {
       let currentTile = openPath.pop();
       let nexTile = openPath[openPath.length - 1];
       let middleTile = currentTile!.calculateMiddle(nexTile, board);
+      this.checkAttackQueen(middleTile, board);
       currentTile?.attackPieceDraw(nexTile, middleTile);
     }
   }
