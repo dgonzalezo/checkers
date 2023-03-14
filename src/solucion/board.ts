@@ -102,39 +102,39 @@ export class Board {
    * selectNewQueen
    */
   public selectNewQueen(newTile: Tile) {
-    let posibleTiles: Tile[] = [];
+    let possibleTiles: Tile[] = [];
 
     for (let i = 0; i < this.size; i++) {
       for (let j = 0; j < this.size; j++) {
         let tile = this.tiles[i][j];
         // Adding only pieces of the same player
         if (tile.owner !== "none" && tile.owner.color === this.turn) {
-          if (!!posibleTiles.length) {
-            let lastTile = posibleTiles[0];
+          if (!!possibleTiles.length) {
+            let lastTile = possibleTiles[0];
             // Adding only furthest position from tho opposiet side y has to be < for blue and y has to be > for red
             if (
               (this.turn === "blue" &&
                 tile.position[0] < lastTile.position[0]) ||
               (this.turn === "red" && tile.position[0] > lastTile.position[0])
             ) {
-              posibleTiles = [tile];
+              possibleTiles = [tile];
               // Adding pieces with the same distance or in the same row
             } else if (tile.position[0] === lastTile.position[0]) {
-              posibleTiles.push(tile);
+              possibleTiles.push(tile);
             }
           } else {
-            posibleTiles.push(tile);
+            possibleTiles.push(tile);
           }
         }
       }
     }
-    if (!posibleTiles.length) {
+    if (!possibleTiles.length) {
       let winner: Player = this.turn === "blue" ? "red" : "blue";
       setWinner(winner);
       this.winner = winner;
       return;
     }
-    let change: boolean = posibleTiles.some(
+    let change: boolean = possibleTiles.some(
       (tile) =>
         tile.position[0] === newTile.position[0] &&
         tile.position[1] === newTile.position[1]
@@ -150,12 +150,12 @@ export class Board {
   }
   /**
    * Move Piece
+   * Main method to process all the movements
    */
 
   public processClick(
     row: number,
     column: number,
-    tileOwner: TileOwner,
     board: Board
   ) {
     let newTile = this.tiles[row][column];
