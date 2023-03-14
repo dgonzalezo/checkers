@@ -17,7 +17,7 @@ setTurn(board.turn);
  */
 export function onTileClick(row: number, column: number, tileOwner: TileOwner) {
   console.log(`row: ${row} column: ${column} owner: ${tileOwner}`);
-  board.processClick(row, column, tileOwner, board);
+  board.processClick(row, column, board);
 }
 
 export function onApply() {
